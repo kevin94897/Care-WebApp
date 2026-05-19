@@ -368,10 +368,80 @@ function LiqView({ result }) {
   )
 }
 
+// ─── Asset map: cada beneficio mapea a un PDF en /public/pdfs/ ──────────────
+const PDF_BY_BENEFIT = {
+  cts:           '/pdfs/valora_constancia_cts.pdf',
+  gratificacion: '/pdfs/valora_constancia_gratificacion.pdf',
+  vacaciones:    '/pdfs/valora_constancia_vacaciones.pdf',
+  liquidacion:   '/pdfs/valora_constancia_liquidacion.pdf',
+}
+
+const TITLE_BY_BENEFIT = {
+  cts:           'Mi cálculo de CTS · Valora',
+  gratificacion: 'Mi gratificación · Valora',
+  vacaciones:    'Mi cálculo de vacaciones · Valora',
+  liquidacion:   'Mi liquidación · Valora',
+}
+
+function triggerDownload(url, filename) {
+  const link = document.createElement('a')
+  link.href = url
+  link.download = filename
+  link.rel = 'noopener'
+  document.body.appendChild(link)
+  link.click()
+  document.body.removeChild(link)
+}
+
 export default function Step3({ data, result, benefit, onBack, onDownload }) {
   const [showDetail, setShowDetail] = useState(false)
   const detailBtnLabel =
     benefit === 'liquidacion' ? 'Conocer mis beneficios truncos' : 'Ver detalle del cálculo'
+
+  const pdfUrl = PDF_BY_BENEFIT[benefit] || PDF_BY_BENEFIT.cts
+  const pdfFilename = pdfUrl.split('/').pop()
+  const shareTitle = TITLE_BY_BENEFIT[benefit] || TITLE_BY_BENEFIT.cts
+
+  async function handleDownload() {
+    try {
+      const res = await fetch(pdfUrl, { method: 'HEAD' })
+      if (!res.ok) {
+        alert(`El PDF aún no está disponible (${pdfFilename}). Subilo a public/pdfs/.`)
+        return
+      }
+      triggerDownload(pdfUrl, pdfFilename)
+    } catch {
+      // Si el HEAD falla (e.g. offline), igual intentamos la descarga directa
+      triggerDownload(pdfUrl, pdfFilename)
+    }
+  }
+
+  async function handleShare() {
+    const shareData = {
+      title: shareTitle,
+      text: `${shareTitle}: ${formatMoney(result.total)}`,
+      url: window.location.href,
+    }
+    if (navigator.share) {
+      try {
+        await navigator.share(shareData)
+      } catch (err) {
+        // Usuario canceló — silencioso. Otros errores los logueamos.
+        if (err?.name !== 'AbortError') console.error(err)
+      }
+      return
+    }
+    if (navigator.clipboard?.writeText) {
+      try {
+        await navigator.clipboard.writeText(window.location.href)
+        alert('Enlace copiado al portapapeles')
+        return
+      } catch {
+        /* fallthrough */
+      }
+    }
+    alert('Tu navegador no soporta compartir. Copia la URL desde la barra de direcciones.')
+  }
 
   return (
     <div>
@@ -406,10 +476,18 @@ export default function Step3({ data, result, benefit, onBack, onDownload }) {
 
         {/* Actions */}
         <div className="flex gap-3 mt-2 fade-up-3">
-          <button className="btn-primary flex-1 flex items-center justify-center gap-4 border-2" onClick={onDownload}>
+          <button
+            type="button"
+            className="btn-primary flex-1 flex items-center justify-center gap-4 border-2"
+            onClick={handleDownload}
+          >
             Descargar
           </button>
-          <button className="btn-secondary flex-1 flex items-center justify-center gap-4 border-2">
+          <button
+            type="button"
+            className="btn-secondary flex-1 flex items-center justify-center gap-4 border-2"
+            onClick={handleShare}
+          >
             Compartir
           </button>
         </div>
