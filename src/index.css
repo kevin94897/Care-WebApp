@@ -266,15 +266,8 @@
 }
 
 @keyframes fadeUp {
-  from {
-    opacity: 0;
-    transform: translateY(16px);
-  }
-
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
+  from { transform: translateY(16px); }
+  to   { transform: translateY(0); }
 }
 
 @keyframes spin {
@@ -326,7 +319,7 @@
 /* ─── Layout ────────────────────────────────────────────────────────────────── */
 .content {
   flex: 1;
-  padding: 30px 20px 60px;
+  padding: 30px 20px 0px;
   overflow-y: auto;
 }
 
@@ -934,9 +927,17 @@
 
   .type-card:hover,
   .type-card.active {
-    @apply bg-blue-light;
+    @apply bg-blue-brand;
     border-width: var(--bw-active);
     border-color: var(--blue);
+  }
+
+  .type-card.active .text-blue-brand,
+  .type-card.active svg path,
+  .type-card:hover .text-blue-brand,
+  .type-card:hover svg path {
+    color: white;
+    fill: white;
   }
 
   .benefit-card {
@@ -949,10 +950,21 @@
     border-color: var(--blue);
   }
 
-  .benefit-card.active {
-    @apply bg-blue-light;
+  .benefit-card.active,
+  .benefit-card:hover {
+    @apply bg-blue-brand;
     border-width: var(--bw-active);
     border-color: var(--blue);
+  }
+
+  .benefit-card.active .text-blue-brand,
+  .benefit-card.active svg path,
+  .benefit-card.active .text-grey-500,
+  .benefit-card:hover .text-blue-brand,
+  .benefit-card:hover svg path,
+  .benefit-card:hover .text-grey-500 {
+    color: white;
+    fill: white;
   }
 
   .benefit-card.disabled {
