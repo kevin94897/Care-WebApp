@@ -205,7 +205,10 @@ export default function Step2Grati({ onNext, onBack, savedData, onSave }) {
           <Controller
             name="fechaInicio"
             control={control}
-            rules={{ required: 'Ingresa la fecha de inicio' }}
+            rules={{
+              required: 'Ingresa la fecha de inicio',
+              validate: v => v?.length === 10 || 'Ingresa una fecha válida',
+            }}
             render={({ field }) => (
               <DateInput
                 {...field}
@@ -270,7 +273,13 @@ export default function Step2Grati({ onNext, onBack, savedData, onSave }) {
             <Controller
               name="fechaCese"
               control={control}
-              rules={{ required: 'Ingresa la fecha de cese' }}
+              rules={{
+                required: 'Ingresa la fecha de cese',
+                validate: v =>
+                  v?.length !== 10
+                    ? 'Ingresa una fecha válida'
+                    : !watchFechaInicio || v >= watchFechaInicio || 'La fecha de cese debe ser posterior a la de inicio',
+              }}
               render={({ field }) => (
                 <DateInput
                   {...field}

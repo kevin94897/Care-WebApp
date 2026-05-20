@@ -26,11 +26,11 @@ export default function WelcomeScreen({ onNext }) {
 
       {/* Fadedown background animation — top half only */}
       <div className="absolute inset-0 pointer-events-none">
-        <div className="fadedown-bg-base" />
+        {/* <div className="fadedown-bg-base" /> */}
         <div className="fadedown-bg-layer fadedown-bg-layer-1" />
         <div className="fadedown-bg-layer fadedown-bg-layer-2" />
         <div className="fadedown-bg-layer fadedown-bg-layer-3" />
-        <div className="fadedown-bg-layer fadedown-bg-layer-4" />
+        {/* <div className="fadedown-bg-layer fadedown-bg-layer-4" /> */}
       </div>
 
       <div className="pt-10 pb-16 px-6 relative z-10 flex flex-col items-center gap-2">
@@ -77,7 +77,7 @@ export default function WelcomeScreen({ onNext }) {
           <img
             src="/img/valora_img_weecome.webp"
             alt="Ilustración Bienvenida Valora"
-            className="w-[90%] h-[90%] object-contain select-none"
+            className="w-[90%] h-[90%] object-contain select-none img-zoom-in"
           />
         </div>
       </div>

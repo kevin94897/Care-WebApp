@@ -82,7 +82,11 @@ const workerSchema = z
       errorMap: () => ({ message: 'Selecciona un tipo de documento' }),
     }),
     numDoc: z.string().min(1, 'Ingresa el número de documento'),
-    fechaNac: z.string().min(1, 'Ingresa tu fecha de nacimiento'),
+    fechaNac: z
+      .string()
+      .min(1, 'Ingresa tu fecha de nacimiento')
+      .refine(v => v.length === 10, 'Ingresa una fecha válida')
+      .refine(v => new Date(v) <= new Date(), 'La fecha de nacimiento no puede ser futura'),
     genero: z.enum(['f', 'm', 'otro'], {
       errorMap: () => ({ message: 'Selecciona tu género' }),
     }),

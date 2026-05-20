@@ -84,7 +84,10 @@ export default function Step2Vaca({ onNext, onBack, savedData, onSave }) {
           <Controller
             name="fechaInicioTrabajo"
             control={control}
-            rules={{ required: 'Ingresa la fecha de inicio' }}
+            rules={{
+              required: 'Ingresa la fecha de inicio',
+              validate: v => v?.length === 10 || 'Ingresa una fecha válida',
+            }}
             render={({ field }) => (
               <DateInput
                 {...field}
@@ -110,7 +113,9 @@ export default function Step2Vaca({ onNext, onBack, savedData, onSave }) {
             rules={{
               required: 'Ingresa la fecha de fin',
               validate: v =>
-                !watchInicio || v >= watchInicio || 'La fecha de fin debe ser posterior a la de inicio',
+                v?.length !== 10
+                  ? 'Ingresa una fecha válida'
+                  : !watchInicio || v >= watchInicio || 'La fecha de fin debe ser posterior a la de inicio',
             }}
             render={({ field }) => (
               <DateInput
