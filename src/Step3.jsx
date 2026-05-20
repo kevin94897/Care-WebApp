@@ -3,6 +3,17 @@ import { Header, Stepper } from './UI'
 import { IconDownload, IconShare } from './Icons'
 import { formatMoney, formatDate } from './calc'
 
+const MESES_ES = ['Enero','Febrero','Marzo','Abril','Mayo','Junio','Julio','Agosto','Septiembre','Octubre','Noviembre','Diciembre']
+
+function gratiPeriodRange(start, end) {
+  if (!start || !end) return ''
+  const [sy, sm] = start.split('-')
+  const [ey, em] = end.split('-')
+  const s = MESES_ES[parseInt(sm, 10) - 1]
+  const e = MESES_ES[parseInt(em, 10) - 1]
+  return sy === ey ? `${s} — ${e} ${ey}` : `${s} ${sy} — ${e} ${ey}`
+}
+
 function IconX() {
   return (
     <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round">
@@ -112,10 +123,6 @@ function GratiSheetBody({ result }) {
           <span className="label">Meses laborados</span>
           <span className="value">{result.months}</span>
         </div>
-        <div className="detail-row">
-          <span className="label">Días laborados</span>
-          <span className="value">{result.days}</span>
-        </div>
       </div>
 
       <div className="detail-section">
@@ -132,18 +139,10 @@ function GratiSheetBody({ result }) {
           <span className="label">Asignación familiar</span>
           <span className="value">{formatMoney(result.af)}</span>
         </div>
-        <div className="detail-row">
-          <span className="label">Bono ({(result.bonoPct * 100).toFixed(2)}% {result.eps ? 'EPS' : 'EsSalud'})</span>
-          <span className="value">{formatMoney(result.bono)}</span>
-        </div>
       </div>
 
       <div className="legal-card">
-        <div className="legal-title">Tarjeta de Desglose Legal · Ley N° 27735</div>
-        <div className="legal-row">
-          <span className="lbl">Periodo</span>
-          <span className="val">{result.periodLabel}</span>
-        </div>
+        <div className="legal-title">Tarjeta de Desglose Legal · Ley N° 31047</div>
         <div className="legal-row">
           <span className="lbl">Fecha Inicio</span>
           <span className="val">{result.periodStart}</span>
@@ -152,8 +151,16 @@ function GratiSheetBody({ result }) {
           <span className="lbl">Fecha Fin</span>
           <span className="val">{result.periodEnd}</span>
         </div>
+        <div className="legal-row">
+          <span className="lbl">Meses computables</span>
+          <span className="val">{result.months}</span>
+        </div>
+        <div className="legal-row">
+          <span className="lbl">Formula</span>
+          <span className="val">({result.months}/6) x S/.{result.sueldo}</span>
+        </div>
         <div className="legal-total">
-          <span className="lbl">Total Gratificación</span>
+          <span className="lbl">Total Gratificacion</span>
           <span className="val">{formatMoney(result.total)}</span>
         </div>
       </div>
@@ -310,13 +317,13 @@ function GratiView({ data, result }) {
   return (
     <>
       <div className="mt-2 mb-1 text-[12px] leading-[18px] font-medium text-grey-500 text-center">
-        Calculadora de gratificación · {result.periodLabel}
+        Calculadora de gratificaciones · {result.periodLabel}
       </div>
 
       <div className="result-hero fade-up">
-        <div className="label">Tu gratificación de {result.periodLabel} es:</div>
+        <div className="label">Tu Gratificacion de {result.periodLabel} es:</div>
         <div className="amount">{formatMoney(result.total)}</div>
-        <div className="period">{result.eps ? 'Régimen EPS' : 'Régimen EsSalud'}</div>
+        <div className="period">Periodo: {gratiPeriodRange(result.periodStart, result.periodEnd)}</div>
       </div>
 
       <div className="result-detail fade-up-2">
