@@ -13,12 +13,12 @@ const BENEFITS = [
   { key: 'liquidacion', label: 'Liquidación', sub: 'Al terminar el trabajo', Icon: IconList },
 ]
 
-export default function Step1({ data, setData, onNext }) {
+export default function Step1({ data, setData, onNext, onBack }) {
   const canNext = data.role && data.benefit
 
   return (
     <div>
-      <Header onBack={() => {}} />
+      <Header onBack={onBack} />
       <div className="px-5 pt-5 pb-28">
         <Stepper current={1} />
         <div className="h-6" />

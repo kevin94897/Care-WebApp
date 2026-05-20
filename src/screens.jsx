@@ -2,7 +2,7 @@ import { useState, useEffect, useRef } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Header, FieldError } from './UI'
+import { Header, FieldError, DateInput } from './UI'
 import { IconCheck, IconCalendar } from './Icons'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
@@ -362,16 +362,10 @@ export function WorkerForm({ onBack, onNext }) {
 
         <div className="field fade-up-2">
           <label>Fecha de nacimiento</label>
-          <div className="relative">
-            <input
-              type="date"
-              className={`input-base ${errors.fechaNac ? 'error' : ''}`}
-              {...register('fechaNac')}
-            />
-            <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-blue-brand opacity-60">
-              <IconCalendar />
-            </span>
-          </div>
+          <DateInput
+            error={!!errors.fechaNac}
+            {...register('fechaNac')}
+          />
           <FieldError message={errors.fechaNac?.message} />
         </div>
 

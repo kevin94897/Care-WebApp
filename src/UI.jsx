@@ -1,4 +1,70 @@
+import { forwardRef, useRef, useEffect } from 'react'
 import { IconBack, IconCalendar, IconCheck } from './Icons'
+
+// ─── Date Input Mask Helpers ──────────────────────────────────────────────────
+const cleanDigits = (val) => {
+  return (val || '').replace(/\D/g, '').slice(0, 8)
+}
+
+const formatToDateMask = (digits) => {
+  if (!digits) return ''
+  if (digits.length <= 2) {
+    return digits
+  }
+  if (digits.length <= 4) {
+    return `${digits.slice(0, 2)}/${digits.slice(2)}`
+  }
+  return `${digits.slice(0, 2)}/${digits.slice(2, 4)}/${digits.slice(4, 8)}`
+}
+
+const parseMaskToDate = (formatted) => {
+  if (!formatted) return ''
+  const parts = formatted.split('/')
+  if (parts.length === 3) {
+    const day = parts[0]
+    const month = parts[1]
+    const year = parts[2]
+    if (day.length === 2 && month.length === 2 && year.length === 4) {
+      const d = parseInt(day, 10)
+      const m = parseInt(month, 10)
+      const y = parseInt(year, 10)
+      if (m >= 1 && m <= 12 && d >= 1 && d <= 31 && y >= 1900 && y <= 2100) {
+        const daysInMonth = new Date(y, m, 0).getDate()
+        if (d <= daysInMonth) {
+          return `${year}-${month}-${day}`
+        }
+      }
+    }
+  }
+  return ''
+}
+
+const formatDateToMask = (isoDate) => {
+  if (!isoDate) return ''
+  const parts = isoDate.split('-')
+  if (parts.length === 3) {
+    const year = parts[0]
+    const month = parts[1]
+    const day = parts[2]
+    if (day.length === 2 && month.length === 2 && year.length === 4) {
+      return `${day}/${month}/${year}`
+    }
+  }
+  return ''
+}
+
+const getCursorPosition = (formatted, digitsBefore) => {
+  let digitCount = 0
+  for (let i = 0; i < formatted.length; i++) {
+    if (digitCount === digitsBefore) {
+      return i
+    }
+    if (/\d/.test(formatted[i])) {
+      digitCount++
+    }
+  }
+  return formatted.length
+}
 
 export function Header({ onBack }) {
   return (
@@ -56,7 +122,7 @@ export function Stepper({ current }) {
             >
               {i + 1 < current ? (
                 <span className="w-4 h-4 flex items-center justify-center">
-                  <IconCheck />
+                  <IconCheck width="14" height="14" className="w-full h-full" />
                 </span>
               ) : (
                 i + 1
@@ -85,24 +151,127 @@ export function Stepper({ current }) {
 }
 
 /**
- * DateInput — styled date input with calendar icon overlay.
+ * DateInput — styled date input with dynamic mask and real-time formatting.
  * Accepts all standard input props plus `error` boolean.
  */
-export function DateInput({ error, className = '', ...props }) {
+export const DateInput = forwardRef(({ error, className = '', onChange, value, ...props }, ref) => {
+  const localRef = useRef(null)
+
+  // Sincroniza la referencia externa y la interna
+  useEffect(() => {
+    if (!ref) return
+    if (typeof ref === 'function') {
+      ref(localRef.current)
+    } else {
+      ref.current = localRef.current
+    }
+  }, [ref])
+
+  // Sincroniza el valor del input del DOM con el valor externo YYYY-MM-DD
+  useEffect(() => {
+    if (localRef.current) {
+      const currentDomValue = localRef.current.value
+      const parsedCurrent = parseMaskToDate(currentDomValue)
+      if (parsedCurrent !== (value || '')) {
+        localRef.current.value = formatDateToMask(value || '')
+      }
+    }
+  }, [value])
+
+  const handleInput = (e) => {
+    const input = e.target
+    const rawValue = input.value
+
+    // Contar cuántos dígitos hay antes del cursor en el input sin formatear
+    const selectionStart = input.selectionStart
+    let digitsBefore = 0
+    for (let i = 0; i < selectionStart; i++) {
+      if (/\d/.test(rawValue[i])) {
+        digitsBefore++
+      }
+    }
+
+    const digits = cleanDigits(rawValue)
+    const formatted = formatToDateMask(digits)
+
+    // Actualiza el elemento DOM de forma síncrona para evitar saltos del cursor
+    input.value = formatted
+
+    const newCursorPos = getCursorPosition(formatted, digitsBefore)
+    input.setSelectionRange(newCursorPos, newCursorPos)
+
+    const isoDate = parseMaskToDate(formatted)
+
+    if (onChange) {
+      const eventMock = {
+        ...e,
+        target: {
+          ...input,
+          value: isoDate,
+          name: props.name,
+        },
+      }
+      onChange(eventMock)
+    }
+  }
+
+  const handleKeyDown = (e) => {
+    const input = e.target
+    if (e.key === 'Backspace') {
+      const { selectionStart, selectionEnd } = input
+      if (selectionStart === selectionEnd && selectionStart > 0) {
+        // Si el carácter que se va a borrar es una barra
+        if (input.value[selectionStart - 1] === '/') {
+          e.preventDefault()
+          const val = input.value
+          // Borrar la barra y también el dígito anterior a ella
+          const newValue = val.slice(0, selectionStart - 2) + val.slice(selectionStart)
+          const digits = cleanDigits(newValue)
+          const formatted = formatToDateMask(digits)
+
+          input.value = formatted
+
+          const newCursorPos = Math.max(0, selectionStart - 2)
+          input.setSelectionRange(newCursorPos, newCursorPos)
+
+          const isoDate = parseMaskToDate(formatted)
+          if (onChange) {
+            const eventMock = {
+              ...e,
+              target: {
+                ...input,
+                value: isoDate,
+                name: props.name,
+              },
+            }
+            onChange(eventMock)
+          }
+        }
+      }
+    }
+  }
+
   return (
     <div className="relative">
       <input
-        type="date"
+        ref={localRef}
+        type="text"
+        inputMode="numeric"
+        pattern="[0-9]*"
+        placeholder="DD/MM/YYYY"
         className={`input-base pr-12 ${error ? 'error' : ''} ${className}`}
+        onChange={handleInput}
+        onKeyDown={handleKeyDown}
+        defaultValue={formatDateToMask(value || '')}
         {...props}
       />
-      {/* Decorative icon — pointer-events-none so native picker still opens */}
+      {/* Icono decorativo */}
       <span className="pointer-events-none absolute right-3.5 top-1/2 -translate-y-1/2 text-blue-brand opacity-60">
         <IconCalendar />
       </span>
     </div>
   )
-}
+})
 
 export function FieldError({ message }) {
   if (!message) return null

@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import WelcomeScreen from './WelcomeScreen'
 import Step1 from './Step1'
 import Step2 from './Step2'
 import Step2Grati from './Step2Grati'
@@ -9,7 +10,7 @@ import { LoadingScreen, EmployerForm, WorkerForm, DownloadScreen } from './scree
 import { calculateCTS, calculateGratificacion, calculateVacaciones, calculateLiquidacion } from './calc'
 
 export default function App() {
-  const [screen, setScreen] = useState('step1')
+  const [screen, setScreen] = useState('welcome')
   const [step1Data, setStep1Data] = useState({ role: null, benefit: null })
   const [step2Data, setStep2Data] = useState(null)
   const [result, setResult] = useState(null)
@@ -47,11 +48,17 @@ export default function App() {
   }
 
   const screens = {
+    welcome: (
+      <WelcomeScreen
+        onNext={() => setScreen('step1')}
+      />
+    ),
     step1: (
       <Step1
         data={step1Data}
         setData={setStep1Data}
         onNext={() => setScreen('step2')}
+        onBack={() => setScreen('welcome')}
       />
     ),
     step2:
