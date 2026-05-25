@@ -153,8 +153,7 @@ export function EmployerForm({ onBack, onNext }) {
           <span className="optional-badge">Opcional</span>
         </p>
         <p className="section-sub fade-up">
-          Completa estos datos para descargar un documento personalizado.
-        </p>
+Para continuar, necesitamos algunos datos del empleador. Si los conoces, completa los campos.<br/><span className="text-lila font-semibold">Si no tienes la información, puedes saltar este paso.</span></p>
 
         <div className="lg:grid lg:grid-cols-2 lg:gap-x-6">
         <div className="field fade-up lg:col-span-2">
@@ -308,6 +307,7 @@ export function WorkerForm({ onBack, onNext }) {
     handleSubmit,
     watch,
     control,
+    trigger,
     formState: { errors, isValid },
   } = useForm({
     resolver: zodResolver(workerSchema),
@@ -357,7 +357,7 @@ export function WorkerForm({ onBack, onNext }) {
       <div className="content">
         <p className="section-title fade-up">Datos de la trabajadora/o del hogar</p>
         <p className="section-sub fade-up">
-          Completa estos datos para descargar un documento personalizado. Son opcionales.
+          Completa estos datos para descargar un documento personalizado. <br /><span className="text-lila font-semibold">Son opcionales.</span>
         </p>
 
         <div className="lg:grid lg:grid-cols-2 lg:gap-x-6">
@@ -469,19 +469,18 @@ export function WorkerForm({ onBack, onNext }) {
           <FieldError message={errors.genero?.message} />
         </div>
 
-        <div ref={refs.terms} className={`fade-up-3 lg:col-span-2 transition-opacity ${generoComplete ? 'opacity-100' : 'opacity-40'}`}>
+        <div ref={refs.terms} className="fade-up-3 lg:col-span-2">
           <div className="checkbox-row">
             <input
               type="checkbox"
               id="terms"
-              disabled={!generoComplete}
               {...register('terms', {
                 onChange: e => {
                   if (e.target.checked) scrollTo(refs.bottom)
                 },
               })}
             />
-            <label htmlFor="terms" className={!generoComplete ? 'text-grey-500' : ''}>He leído y acepto los Términos y Condiciones</label>
+            <label htmlFor="terms">He leído y acepto los Términos y Condiciones</label>
           </div>
           <FieldError message={errors.terms?.message} />
         </div>
@@ -495,7 +494,14 @@ export function WorkerForm({ onBack, onNext }) {
 
       <div className={isAtBottom ? 'bottom-bar bottom-bar--static' : 'bottom-bar'}>
         <button type="submit" className="btn-primary" disabled={!isValid}>Siguiente →</button>
-        <button type="button" className="btn-secondary" onClick={() => onNext({})}>
+        <button type="button" className="btn-secondary" onClick={async () => {
+          const termsOk = await trigger('terms')
+          if (termsOk) {
+            onNext({})
+          } else {
+            scrollTo(refs.terms)
+          }
+        }}>
           Saltar este paso
         </button>
       </div>
