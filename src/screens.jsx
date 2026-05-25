@@ -2,31 +2,12 @@ import { useState, useEffect, useRef } from 'react'
 import { useForm, Controller } from 'react-hook-form'
 import { zodResolver } from '@hookform/resolvers/zod'
 import { z } from 'zod'
-import { Header, FieldError, DateInput } from './UI'
+import { Header, FieldError, DateInput, useSticky } from './UI'
 import { IconCheck, IconCalendar } from './Icons'
 
 // ─── Helpers ──────────────────────────────────────────────────────────────────
 // Limpia el valor dejando sólo dígitos (para DNI/RUC).
 const onlyDigits = (s) => (s || '').replace(/\D+/g, '')
-
-// Devuelve true cuando el sentinel (pie del formulario) es visible
-function useSticky() {
-  const sentinelRef = useRef(null)
-  const [isAtBottom, setIsAtBottom] = useState(false)
-
-  useEffect(() => {
-    const el = sentinelRef.current
-    if (!el) return
-    const observer = new IntersectionObserver(
-      ([entry]) => setIsAtBottom(entry.isIntersecting),
-      { threshold: 0 }
-    )
-    observer.observe(el)
-    return () => observer.disconnect()
-  }, [])
-
-  return { sentinelRef, isAtBottom }
-}
 
 // ─── Schemas Zod ──────────────────────────────────────────────────────────────
 // RUC: exactamente 11 dígitos
@@ -123,7 +104,7 @@ export function EmployerForm({ onBack, onNext }) {
     handleSubmit,
     watch,
     control,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm({
     resolver: zodResolver(employerSchema),
     mode: 'onChange',
@@ -136,10 +117,30 @@ export function EmployerForm({ onBack, onNext }) {
     },
   })
 
+  const watchRazonSocial = watch('razonSocial') || ''
+  const watchRuc = watch('ruc') || ''
+  const watchDomicilio = watch('domicilio') || ''
   const tipoDoc = watch('tipoDoc')
   const numDoc = watch('numDoc') || ''
   const numDocMax = tipoDoc === 'dni' ? 8 : 20
   const isNumericDoc = tipoDoc === 'dni'
+
+  const rucComplete = watchRuc.length === 11
+  const razonSocialComplete = watchRazonSocial.trim().length > 0
+  const domicilioComplete = watchDomicilio.trim().length > 0
+  const tipoDocComplete = !!tipoDoc
+
+  const refs = {
+    ruc: useRef(),
+    domicilio: useRef(),
+    tipoDoc: useRef(),
+    numDoc: useRef(),
+    bottom: useRef(),
+  }
+
+  const scrollTo = (ref) => {
+    setTimeout(() => ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 150)
+  }
 
   const onValid = (data) => onNext(data)
 
@@ -162,13 +163,17 @@ export function EmployerForm({ onBack, onNext }) {
             type="text"
             className={`input-base ${errors.razonSocial ? 'error' : ''}`}
             placeholder="Ingresa el nombre o razón social"
-            {...register('razonSocial')}
+            {...register('razonSocial', {
+              onBlur: e => {
+                if (e.target.value.trim()) scrollTo(refs.ruc)
+              },
+            })}
           />
           <FieldError message={errors.razonSocial?.message} />
         </div>
 
-        <div className="field fade-up-2">
-          <label>RUC</label>
+        <div ref={refs.ruc} className={`field fade-up-2 transition-opacity ${razonSocialComplete ? 'opacity-100' : 'opacity-40'}`}>
+          <label className={!razonSocialComplete ? 'text-grey-500' : ''}>RUC</label>
           <Controller
             name="ruc"
             control={control}
@@ -177,15 +182,22 @@ export function EmployerForm({ onBack, onNext }) {
                 type="text"
                 inputMode="numeric"
                 pattern="[0-9]*"
+                disabled={!razonSocialComplete}
                 className={`input-base ${errors.ruc ? 'error' : ''}`}
                 placeholder="Ingresa el RUC"
                 maxLength={11}
                 value={field.value}
-                onChange={e => field.onChange(onlyDigits(e.target.value))}
+                onChange={e => {
+                  const v = onlyDigits(e.target.value)
+                  field.onChange(v)
+                  if (v.length === 11) scrollTo(refs.domicilio)
+                }}
                 onPaste={e => {
                   e.preventDefault()
                   const text = e.clipboardData.getData('text')
-                  field.onChange(onlyDigits(text).slice(0, 11))
+                  const v = onlyDigits(text).slice(0, 11)
+                  field.onChange(v)
+                  if (v.length === 11) scrollTo(refs.domicilio)
                 }}
               />
             )}
@@ -193,23 +205,33 @@ export function EmployerForm({ onBack, onNext }) {
           <FieldError message={errors.ruc?.message} />
         </div>
 
-        <div className="field fade-up-2 lg:col-span-2">
-          <label>Domicilio</label>
+        <div ref={refs.domicilio} className={`field fade-up-2 lg:col-span-2 transition-opacity ${rucComplete ? 'opacity-100' : 'opacity-40'}`}>
+          <label className={!rucComplete ? 'text-grey-500' : ''}>Domicilio</label>
           <input
             type="text"
+            disabled={!rucComplete}
             className={`input-base ${errors.domicilio ? 'error' : ''}`}
             placeholder="Ingresa el domicilio"
-            {...register('domicilio')}
+            {...register('domicilio', {
+              onBlur: e => {
+                if (e.target.value.trim()) scrollTo(refs.tipoDoc)
+              },
+            })}
           />
           <FieldError message={errors.domicilio?.message} />
         </div>
 
-        <div className="field fade-up-3">
-          <label>Tipo de documento</label>
+        <div ref={refs.tipoDoc} className={`field fade-up-3 transition-opacity ${domicilioComplete ? 'opacity-100' : 'opacity-40'}`}>
+          <label className={!domicilioComplete ? 'text-grey-500' : ''}>Tipo de documento</label>
           <div className="relative">
             <select
+              disabled={!domicilioComplete}
               className={`input-base appearance-none pr-10 ${errors.tipoDoc ? 'error' : ''}`}
-              {...register('tipoDoc')}
+              {...register('tipoDoc', {
+                onChange: e => {
+                  if (e.target.value) scrollTo(refs.numDoc)
+                },
+              })}
             >
               <option value="">Selecciona tipo de documento</option>
               <option value="dni">DNI</option>
@@ -221,8 +243,8 @@ export function EmployerForm({ onBack, onNext }) {
           <FieldError message={errors.tipoDoc?.message} />
         </div>
 
-        <div className="field fade-up-3">
-          <label>Número de documento</label>
+        <div ref={refs.numDoc} className={`field fade-up-3 transition-opacity ${tipoDocComplete ? 'opacity-100' : 'opacity-40'}`}>
+          <label className={!tipoDocComplete ? 'text-grey-500' : ''}>Número de documento</label>
           <Controller
             name="numDoc"
             control={control}
@@ -231,19 +253,24 @@ export function EmployerForm({ onBack, onNext }) {
                 type="text"
                 inputMode={isNumericDoc ? 'numeric' : 'text'}
                 pattern={isNumericDoc ? '[0-9]*' : undefined}
+                disabled={!tipoDocComplete}
                 className={`input-base ${errors.numDoc ? 'error' : ''}`}
                 placeholder="Digita el número de documento"
                 maxLength={numDocMax}
                 value={field.value}
                 onChange={e => {
                   const v = isNumericDoc ? onlyDigits(e.target.value) : e.target.value
-                  field.onChange(v.slice(0, numDocMax))
+                  const trimmed = v.slice(0, numDocMax)
+                  field.onChange(trimmed)
+                  if (trimmed.length === numDocMax) scrollTo(refs.bottom)
                 }}
                 onPaste={e => {
                   if (!isNumericDoc) return
                   e.preventDefault()
                   const text = e.clipboardData.getData('text')
-                  field.onChange(onlyDigits(text).slice(0, numDocMax))
+                  const v = onlyDigits(text).slice(0, numDocMax)
+                  field.onChange(v)
+                  if (v.length === numDocMax) scrollTo(refs.bottom)
                 }}
               />
             )}
@@ -256,13 +283,15 @@ export function EmployerForm({ onBack, onNext }) {
           </div>
         </div>
         </div>
+
+        <div ref={refs.bottom} className="h-1" />
       </div>
 
       {/* Sentinel: cuando es visible el bottom-bar deja de flotar */}
       <div ref={sentinelRef} style={{ height: 1 }} />
 
       <div className={isAtBottom ? 'bottom-bar bottom-bar--static' : 'bottom-bar'}>
-        <button type="submit" className="btn-primary">Siguiente →</button>
+        <button type="submit" className="btn-primary" disabled={!isValid}>Siguiente →</button>
         <button type="button" className="btn-secondary" onClick={() => onNext({})}>
           Saltar este paso
         </button>
@@ -279,7 +308,7 @@ export function WorkerForm({ onBack, onNext }) {
     handleSubmit,
     watch,
     control,
-    formState: { errors },
+    formState: { errors, isValid },
   } = useForm({
     resolver: zodResolver(workerSchema),
     mode: 'onChange',
@@ -293,9 +322,32 @@ export function WorkerForm({ onBack, onNext }) {
     },
   })
 
+  const watchNombres = watch('nombres') || ''
   const tipoDoc = watch('tipoDoc')
+  const watchNumDoc = watch('numDoc') || ''
+  const watchFechaNac = watch('fechaNac') || ''
+  const watchGenero = watch('genero')
   const isNumericDoc = tipoDoc === 'dni'
   const numDocMax = tipoDoc === 'dni' ? 8 : 20
+
+  const nombresComplete = watchNombres.trim().length > 0
+  const tipoDocComplete = !!tipoDoc
+  const numDocComplete = watchNumDoc.length === numDocMax
+  const fechaNacComplete = watchFechaNac.length === 10
+  const generoComplete = !!watchGenero
+
+  const refs = {
+    tipoDoc: useRef(),
+    numDoc: useRef(),
+    fechaNac: useRef(),
+    genero: useRef(),
+    terms: useRef(),
+    bottom: useRef(),
+  }
+
+  const scrollTo = (ref) => {
+    setTimeout(() => ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 150)
+  }
 
   const onValid = (data) => onNext(data)
 
@@ -315,17 +367,26 @@ export function WorkerForm({ onBack, onNext }) {
             type="text"
             className={`input-base ${errors.nombres ? 'error' : ''}`}
             placeholder="Ingresa tus nombres y apellidos"
-            {...register('nombres')}
+            {...register('nombres', {
+              onBlur: e => {
+                if (e.target.value.trim()) scrollTo(refs.tipoDoc)
+              },
+            })}
           />
           <FieldError message={errors.nombres?.message} />
         </div>
 
-        <div className="field fade-up-2">
-          <label>Tipo de documento</label>
+        <div ref={refs.tipoDoc} className={`field fade-up-2 transition-opacity ${nombresComplete ? 'opacity-100' : 'opacity-40'}`}>
+          <label className={!nombresComplete ? 'text-grey-500' : ''}>Tipo de documento</label>
           <div className="relative">
             <select
+              disabled={!nombresComplete}
               className={`input-base appearance-none pr-10 ${errors.tipoDoc ? 'error' : ''}`}
-              {...register('tipoDoc')}
+              {...register('tipoDoc', {
+                onChange: e => {
+                  if (e.target.value) scrollTo(refs.numDoc)
+                },
+              })}
             >
               <option value="">Selecciona tipo de documento</option>
               <option value="dni">DNI</option>
@@ -337,8 +398,8 @@ export function WorkerForm({ onBack, onNext }) {
           <FieldError message={errors.tipoDoc?.message} />
         </div>
 
-        <div className="field fade-up-2">
-          <label>Número de documento</label>
+        <div ref={refs.numDoc} className={`field fade-up-2 transition-opacity ${tipoDocComplete ? 'opacity-100' : 'opacity-40'}`}>
+          <label className={!tipoDocComplete ? 'text-grey-500' : ''}>Número de documento</label>
           <Controller
             name="numDoc"
             control={control}
@@ -347,19 +408,24 @@ export function WorkerForm({ onBack, onNext }) {
                 type="text"
                 inputMode={isNumericDoc ? 'numeric' : 'text'}
                 pattern={isNumericDoc ? '[0-9]*' : undefined}
+                disabled={!tipoDocComplete}
                 className={`input-base ${errors.numDoc ? 'error' : ''}`}
                 placeholder="Digita tu número de documento"
                 maxLength={numDocMax}
                 value={field.value}
                 onChange={e => {
                   const v = isNumericDoc ? onlyDigits(e.target.value) : e.target.value
-                  field.onChange(v.slice(0, numDocMax))
+                  const trimmed = v.slice(0, numDocMax)
+                  field.onChange(trimmed)
+                  if (trimmed.length === numDocMax) scrollTo(refs.fechaNac)
                 }}
                 onPaste={e => {
                   if (!isNumericDoc) return
                   e.preventDefault()
                   const text = e.clipboardData.getData('text')
-                  field.onChange(onlyDigits(text).slice(0, numDocMax))
+                  const v = onlyDigits(text).slice(0, numDocMax)
+                  field.onChange(v)
+                  if (v.length === numDocMax) scrollTo(refs.fechaNac)
                 }}
               />
             )}
@@ -367,21 +433,31 @@ export function WorkerForm({ onBack, onNext }) {
           <FieldError message={errors.numDoc?.message} />
         </div>
 
-        <div className="field fade-up-2">
-          <label>Fecha de nacimiento</label>
+        <div ref={refs.fechaNac} className={`field fade-up-2 transition-opacity ${numDocComplete ? 'opacity-100' : 'opacity-40'}`}>
+          <label className={!numDocComplete ? 'text-grey-500' : ''}>Fecha de nacimiento</label>
           <DateInput
             error={!!errors.fechaNac}
-            {...register('fechaNac')}
+            disabled={!numDocComplete}
+            {...register('fechaNac', {
+              onChange: e => {
+                if (e.target.value?.length === 10) scrollTo(refs.genero)
+              },
+            })}
           />
           <FieldError message={errors.fechaNac?.message} />
         </div>
 
-        <div className="field fade-up-3">
-          <label>Género</label>
+        <div ref={refs.genero} className={`field fade-up-3 transition-opacity ${fechaNacComplete ? 'opacity-100' : 'opacity-40'}`}>
+          <label className={!fechaNacComplete ? 'text-grey-500' : ''}>Género</label>
           <div className="relative">
             <select
+              disabled={!fechaNacComplete}
               className={`input-base appearance-none pr-10 ${errors.genero ? 'error' : ''}`}
-              {...register('genero')}
+              {...register('genero', {
+                onChange: e => {
+                  if (e.target.value) scrollTo(refs.terms)
+                },
+              })}
             >
               <option value="">Selecciona tu género</option>
               <option value="f">Femenino</option>
@@ -393,19 +469,32 @@ export function WorkerForm({ onBack, onNext }) {
           <FieldError message={errors.genero?.message} />
         </div>
 
-        <div className="checkbox-row fade-up-3 lg:col-span-2">
-          <input type="checkbox" id="terms" {...register('terms')} />
-          <label htmlFor="terms">He leído y acepto los Términos y Condiciones</label>
+        <div ref={refs.terms} className={`fade-up-3 lg:col-span-2 transition-opacity ${generoComplete ? 'opacity-100' : 'opacity-40'}`}>
+          <div className="checkbox-row">
+            <input
+              type="checkbox"
+              id="terms"
+              disabled={!generoComplete}
+              {...register('terms', {
+                onChange: e => {
+                  if (e.target.checked) scrollTo(refs.bottom)
+                },
+              })}
+            />
+            <label htmlFor="terms" className={!generoComplete ? 'text-grey-500' : ''}>He leído y acepto los Términos y Condiciones</label>
+          </div>
+          <FieldError message={errors.terms?.message} />
         </div>
-        <FieldError message={errors.terms?.message} />
         </div>
+
+        <div ref={refs.bottom} className="h-1" />
       </div>
 
       {/* Sentinel: cuando es visible el bottom-bar deja de flotar */}
       <div ref={sentinelRef} style={{ height: 1 }} />
 
       <div className={isAtBottom ? 'bottom-bar bottom-bar--static' : 'bottom-bar'}>
-        <button type="submit" className="btn-primary">Siguiente →</button>
+        <button type="submit" className="btn-primary" disabled={!isValid}>Siguiente →</button>
         <button type="button" className="btn-secondary" onClick={() => onNext({})}>
           Saltar este paso
         </button>

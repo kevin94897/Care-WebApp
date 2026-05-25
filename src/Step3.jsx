@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Header, Stepper } from './UI'
+import { Header, Stepper, useSticky, bottomBarCls } from './UI'
 import { IconDownload, IconShare } from './Icons'
 import { formatMoney, formatDate } from './calc'
 
@@ -402,6 +402,7 @@ function triggerDownload(url, filename) {
 
 export default function Step3({ data, result, benefit, onBack, onDownload }) {
   const [showDetail, setShowDetail] = useState(false)
+  const { sentinelRef, isAtBottom } = useSticky()
   const detailBtnLabel =
     benefit === 'liquidacion' ? 'Conocer mis beneficios truncos' : 'Ver detalle del cálculo'
 
@@ -500,8 +501,10 @@ export default function Step3({ data, result, benefit, onBack, onDownload }) {
         </div>
       </div>
 
+      <div ref={sentinelRef} style={{ height: 1 }} />
+
       {/* Fixed button container for mobile */}
-      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white px-5 py-4 z-20 lg:static lg:translate-x-0 lg:max-w-2xl lg:mx-auto lg:px-0 lg:py-8 lg:bg-transparent lg:flex lg:justify-end">
+      <div className={bottomBarCls(isAtBottom)}>
         <div className="flex gap-3 w-full">
           <button
             type="button"

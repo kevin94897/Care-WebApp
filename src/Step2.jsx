@@ -1,6 +1,6 @@
 import { useRef, useEffect } from 'react'
 import { useForm, Controller } from 'react-hook-form'
-import { Header, Stepper, DateInput, FieldError } from './UI'
+import { Header, Stepper, DateInput, FieldError, useSticky, bottomBarCls } from './UI'
 
 const MONTHS_ES = ['11/2025', '12/2025', '01/2026', '02/2026', '03/2026', '04/2026']
 
@@ -47,6 +47,8 @@ export default function Step2({ onNext, onBack, savedData, onSave }) {
     hijos: useRef(),
     bottom: useRef(),
   }
+
+  const { sentinelRef, isAtBottom } = useSticky()
 
   const scrollTo = (ref) => {
     setTimeout(() => ref.current?.scrollIntoView({ behavior: 'smooth', block: 'center' }), 150)
@@ -432,7 +434,9 @@ export default function Step2({ onNext, onBack, savedData, onSave }) {
         </div>
       </div>
 
-      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white px-5 py-4 z-20 lg:static lg:translate-x-0 lg:max-w-2xl lg:mx-auto lg:px-0 lg:py-8 lg:bg-transparent lg:flex lg:justify-end">
+      <div ref={sentinelRef} style={{ height: 1 }} />
+
+      <div className={bottomBarCls(isAtBottom)}>
         <button type="submit" className="btn-primary lg:w-auto lg:min-w-[240px]" disabled={!canNext}>
           Siguiente →
         </button>

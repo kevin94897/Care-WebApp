@@ -1,5 +1,37 @@
-import { forwardRef, useRef, useEffect } from 'react'
+import { forwardRef, useRef, useEffect, useState } from 'react'
 import { IconBack, IconCalendar, IconCheck } from './Icons'
+
+// Devuelve true cuando el sentinel (pie del formulario) entra al viewport.
+// Sirve para que el bottom-bar flotante deje de flotar y pase a flujo
+// cuando el usuario llega al final del contenido — evita que los botones
+// tapen el último campo en pantallas pequeñas.
+export function useSticky() {
+  const sentinelRef = useRef(null)
+  const [isAtBottom, setIsAtBottom] = useState(false)
+
+  useEffect(() => {
+    const el = sentinelRef.current
+    if (!el) return
+    const observer = new IntersectionObserver(
+      ([entry]) => setIsAtBottom(entry.isIntersecting),
+      { threshold: 0 }
+    )
+    observer.observe(el)
+    return () => observer.disconnect()
+  }, [])
+
+  return { sentinelRef, isAtBottom }
+}
+
+// Genera el className del bottom-bar mobile. Cuando isAtBottom es true,
+// el bar pasa a flujo normal (mx-auto) en lugar de flotar (fixed).
+// Las clases lg: mantienen el comportamiento desktop intacto.
+export function bottomBarCls(isAtBottom) {
+  const mobilePos = isAtBottom
+    ? 'mx-auto'
+    : 'fixed bottom-0 left-1/2 -translate-x-1/2'
+  return `${mobilePos} w-full max-w-[430px] bg-white px-5 py-4 z-20 lg:static lg:translate-x-0 lg:max-w-2xl lg:mx-auto lg:px-0 lg:py-8 lg:bg-transparent lg:flex lg:justify-end`
+}
 
 // ─── Date Input Mask Helpers ──────────────────────────────────────────────────
 const cleanDigits = (val) => {
