@@ -22,10 +22,13 @@ export const IconWelcomeClock = () => (
 
 export default function WelcomeScreen({ onNext }) {
   return (
-    <div className="w-full max-w-[430px] min-h-screen bg-white flex flex-col justify-between mx-auto relative font-sans overflow-hidden">
+    <div className="w-full max-w-[430px] lg:max-w-none min-h-screen bg-white flex flex-col mx-auto relative font-sans overflow-hidden lg:grid lg:grid-cols-2 lg:items-stretch">
+
+      {/* ─── Columna izquierda (en desktop): hero azul con ilustración ─────── */}
+      <div className="relative flex flex-col lg:bg-blue-brand lg:min-h-screen">
 
       {/* Fadedown background animation — top half only */}
-      <div className="absolute inset-0 pointer-events-none">
+      <div className="absolute inset-0 pointer-events-none lg:hidden">
         {/* <div className="fadedown-bg-base" /> */}
         <div className="fadedown-bg-layer fadedown-bg-layer-1" />
         <div className="fadedown-bg-layer fadedown-bg-layer-2" />
@@ -33,7 +36,7 @@ export default function WelcomeScreen({ onNext }) {
         {/* <div className="fadedown-bg-layer fadedown-bg-layer-4" /> */}
       </div>
 
-      <div className="pt-10 pb-16 px-6 relative z-10 flex flex-col items-center gap-2">
+      <div className="pt-10 pb-16 md:pb-0 px-6 relative z-10 flex flex-col items-center gap-2 lg:pt-16 lg:items-start lg:px-16 relative md:absolute">
         {/* White Valora Logo */}
         <div className="text-white mb-2">
           <svg width="105" height="26" viewBox="0 0 80 20" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -68,32 +71,42 @@ export default function WelcomeScreen({ onNext }) {
       </div>
 
       {/* ─── Illustration Card Area ─────────────────────────────────────────────── */}
-      <div className="px-6 -mt-10 relative z-10 flex justify-center">
+      <div className="px-6 -mt-10 relative z-10 flex justify-center lg:flex-1 lg:items-center lg:px-16 lg:mt-0">
         <div
-          className="w-full max-w-[290px] aspect-square rounded-[32px] overflow-hidden flex items-end justify-center relative"
+          className="w-full max-w-[290px] lg:max-w-[400px] aspect-square rounded-[32px] overflow-hidden flex items-end justify-center relative"
         >
           {/* Subtle decoration inside the card */}
           {/* <div className="absolute top-0 right-0 w-24 h-24 bg-white/10 rounded-full -mr-6 -mt-6 blur-xl pointer-events-none" /> */}
           <img
             src="/img/valora_img_weecome.webp"
             alt="Ilustración Bienvenida Valora"
-            className="w-[90%] h-[90%] object-contain select-none img-zoom-in"
+            className="w-[90%] h-[90%] object-contain select-none img-zoom-in lg:hidden"
+          />
+          <img
+            src="/img/valora_img_welcome_desktop.webp"
+            alt="Ilustración Bienvenida Valora Desktop"
+            className="object-contain select-none img-zoom-in hidden lg:block"
           />
         </div>
       </div>
 
+      </div>
+
+      {/* ─── Columna derecha (en desktop): copy + CTA ──────────────────────── */}
+      <div className="flex flex-col lg:justify-center lg:px-16 lg:py-16 lg:bg-white">
+
       {/* ─── Text & Copy Area ───────────────────────────────────────────────────── */}
-      <div className="px-6 flex flex-col items-center mt-6 text-center relative z-10">
-        <h1 className="text-[26px] leading-[32px] font-medium text-blue-brand">
+      <div className="px-6 flex flex-col items-center mt-6 text-center relative z-10 lg:items-start lg:text-left lg:px-0 lg:mt-0 lg:max-w-md">
+        <h1 className="text-[26px] leading-[32px] font-medium text-blue-brand lg:text-[44px] lg:leading-[52px] lg:font-semibold">
           ¡Bienvenida/o a Valora!
         </h1>
-        <p className="text-[15px] leading-[22px] text-grey-900 mt-2.5 max-w-[340px]">
+        <p className="text-[15px] leading-[22px] text-grey-900 mt-2.5 max-w-[340px] lg:text-[18px] lg:leading-[28px] lg:mt-4 lg:max-w-md">
           Calcula tus <span className="font-semibold text-dark">beneficios laborales</span> de forma rápida, segura y anónima.
         </p>
       </div>
 
       {/* ─── Features Horizontal List ───────────────────────────────────────────── */}
-      <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mt-8 px-6 text-grey-900 text-[13px] leading-[19px] font-medium relative z-10">
+      <div className="flex flex-wrap items-center justify-center gap-x-5 gap-y-2 mt-8 px-6 text-grey-900 text-[13px] leading-[19px] font-medium relative z-10 lg:justify-start lg:px-0 lg:mt-10 lg:gap-x-6">
         <div className="flex items-center gap-1.5">
           <IconWelcomeUser />
           <span>Sin registro</span>
@@ -109,14 +122,16 @@ export default function WelcomeScreen({ onNext }) {
       </div>
 
       {/* ─── Bottom CTA Button ──────────────────────────────────────────────────── */}
-      <div className="p-6 mt-8 w-full relative z-10">
+      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white px-5 py-4 z-20 lg:static lg:translate-x-0 lg:max-w-2xl lg:mx-auto lg:px-0 lg:py-8 lg:bg-transparent lg:flex lg:justify-start">
         <button
           type="button"
           onClick={onNext}
-          className="btn-primary w-full"
+          className="btn-primary w-full lg:w-auto lg:min-w-[240px]"
         >
           Empezar ahora
         </button>
+      </div>
+
       </div>
 
     </div>

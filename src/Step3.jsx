@@ -450,62 +450,83 @@ export default function Step3({ data, result, benefit, onBack, onDownload }) {
     alert('Tu navegador no soporta compartir. Copia la URL desde la barra de direcciones.')
   }
 
+  const sheetTitle = benefit === 'liquidacion' ? 'Mis beneficios truncos' : 'Detalle del cálculo'
+
   return (
     <div>
       <Header onBack={onBack} />
-      <div className="content">
+      <div className="content pb-28 lg:pb-0 ">
         <Stepper current={3} />
 
-        {benefit === 'vacaciones' && <VacaView data={data} result={result} />}
-        {benefit === 'gratificacion' && <GratiView data={data} result={result} />}
-        {benefit === 'liquidacion' && <LiqView result={result} />}
-        {(!benefit || benefit === 'cts') && <CtsView data={data} result={result} />}
+        <div className="lg:grid lg:grid-cols-[1fr_400px] lg:gap-10 lg:items-start">
+          {/* Columna principal: hero + summary */}
+          <div>
+            {benefit === 'vacaciones' && <VacaView data={data} result={result} />}
+            {benefit === 'gratificacion' && <GratiView data={data} result={result} />}
+            {benefit === 'liquidacion' && <LiqView result={result} />}
+            {(!benefit || benefit === 'cts') && <CtsView data={data} result={result} />}
 
-        {/* Detail – Bottom Sheet trigger */}
-        <div className="detail-card fade-up-3">
-          <button
-            className="detail-card-header"
-            onClick={() => setShowDetail(true)}
-            aria-haspopup="dialog"
-          >
-            <span>{detailBtnLabel}</span>
-            <span className="detail-card-arrow">↗</span>
-          </button>
+            {/* Detail trigger — sólo en mobile abre sheet */}
+            <div className="detail-card fade-up-3 lg:hidden">
+              <button
+                className="detail-card-header"
+                onClick={() => setShowDetail(true)}
+                aria-haspopup="dialog"
+              >
+                <span>{detailBtnLabel}</span>
+                <span className="detail-card-arrow">↗</span>
+              </button>
+            </div>
+
+            {/* Actions */}
+            <div className="mt-4 px-4 py-3.5 text-[13px] leading-[19px] font-medium text-grey-500 text-center lg:text-left lg:px-0 lg:mt-6">
+              ¿Quieres un documento más completo? Ingresa los datos del empleador/a y los tuyos.
+            </div>
+            <button className="btn-outline-only mt-2.5 lg:mt-4" onClick={onDownload}>
+              Ingresar datos del empleador/a →
+            </button>
+          </div>
+
+          {/* Columna secundaria desktop: detalle inline (oculto en mobile) */}
+          <aside className="hidden lg:block bg-white border border-blue-200 rounded-ds-lg p-6 fade-up-3 sticky top-28">
+            <div className="text-[18px] leading-[24px] font-semibold text-dark mb-4">
+              {sheetTitle}
+            </div>
+            {benefit === 'vacaciones' && <VacaSheetBody result={result} />}
+            {benefit === 'gratificacion' && <GratiSheetBody result={result} />}
+            {benefit === 'liquidacion' && <LiqSheetBody result={result} />}
+            {(!benefit || benefit === 'cts') && <CtsSheetBody result={result} />}
+          </aside>
         </div>
+      </div>
 
-        {/* Bottom Sheet */}
-        <DetailSheet
-          open={showDetail}
-          onClose={() => setShowDetail(false)}
-          result={result}
-          benefit={benefit}
-        />
-
-        {/* Actions */}
-        <div className="flex gap-3 mt-2 fade-up-3">
+      {/* Fixed button container for mobile */}
+      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white px-5 py-4 z-20 lg:static lg:translate-x-0 lg:max-w-2xl lg:mx-auto lg:px-0 lg:py-8 lg:bg-transparent lg:flex lg:justify-end">
+        <div className="flex gap-3 w-full">
           <button
             type="button"
-            className="btn-primary flex-1 flex items-center justify-center gap-4 border-2"
+            className="btn-primary flex-1 flex items-center justify-center gap-4 border-2 lg:w-auto lg:min-w-[120px]"
             onClick={handleDownload}
           >
             Descargar
           </button>
           <button
             type="button"
-            className="btn-secondary flex-1 flex items-center justify-center gap-4 border-2"
+            className="btn-secondary flex-1 flex items-center justify-center gap-4 border-2 lg:w-auto lg:min-w-[120px]"
             onClick={handleShare}
           >
             Compartir
           </button>
         </div>
-
-        <div className="mt-4 px-4 py-3.5 text-[13px] leading-[19px] font-medium text-grey-500 text-center">
-          ¿Quieres un documento más completo? Ingresa los datos del empleador/a y los tuyos.
-        </div>
-        <button className="btn-outline-only mt-2.5" onClick={onDownload}>
-          Ingresar datos del empleador/a →
-        </button>
       </div>
+
+      {/* Bottom Sheet — sólo se usa en mobile */}
+      <DetailSheet
+        open={showDetail}
+        onClose={() => setShowDetail(false)}
+        result={result}
+        benefit={benefit}
+      />
     </div>
   )
 }

@@ -155,7 +155,8 @@ export function EmployerForm({ onBack, onNext }) {
           Completa estos datos para descargar un documento personalizado.
         </p>
 
-        <div className="field fade-up">
+        <div className="lg:grid lg:grid-cols-2 lg:gap-x-6">
+        <div className="field fade-up lg:col-span-2">
           <label>Nombre o razón social</label>
           <input
             type="text"
@@ -192,7 +193,7 @@ export function EmployerForm({ onBack, onNext }) {
           <FieldError message={errors.ruc?.message} />
         </div>
 
-        <div className="field fade-up-2">
+        <div className="field fade-up-2 lg:col-span-2">
           <label>Domicilio</label>
           <input
             type="text"
@@ -254,6 +255,7 @@ export function EmployerForm({ onBack, onNext }) {
             </p>
           </div>
         </div>
+        </div>
       </div>
 
       {/* Sentinel: cuando es visible el bottom-bar deja de flotar */}
@@ -306,7 +308,8 @@ export function WorkerForm({ onBack, onNext }) {
           Completa estos datos para descargar un documento personalizado. Son opcionales.
         </p>
 
-        <div className="field fade-up">
+        <div className="lg:grid lg:grid-cols-2 lg:gap-x-6">
+        <div className="field fade-up lg:col-span-2">
           <label>Nombres y apellidos</label>
           <input
             type="text"
@@ -390,11 +393,12 @@ export function WorkerForm({ onBack, onNext }) {
           <FieldError message={errors.genero?.message} />
         </div>
 
-        <div className="checkbox-row fade-up-3">
+        <div className="checkbox-row fade-up-3 lg:col-span-2">
           <input type="checkbox" id="terms" {...register('terms')} />
           <label htmlFor="terms">He leído y acepto los Términos y Condiciones</label>
         </div>
         <FieldError message={errors.terms?.message} />
+        </div>
       </div>
 
       {/* Sentinel: cuando es visible el bottom-bar deja de flotar */}

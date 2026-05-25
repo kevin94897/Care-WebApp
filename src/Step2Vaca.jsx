@@ -65,9 +65,10 @@ export default function Step2Vaca({ onNext, onBack, savedData, onSave }) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
       <Header onBack={onBack} />
-      <div className="px-5 pt-5 pb-28 overflow-y-auto">
+      <div className="px-5 pt-5 pb-28 overflow-y-auto lg:dt-shell lg:pb-0 lg:overflow-visible">
         <Stepper current={2} />
         <div className="h-4" />
+        <div className="lg:max-w-2xl lg:mx-auto">
 
         {/* Reminder */}
         <div className="mb-5 text-[15px] leading-[22px] font-medium text-dark animate-fade-up">
@@ -280,10 +281,11 @@ export default function Step2Vaca({ onNext, onBack, savedData, onSave }) {
 
         {/* Sentinel: scroll target tras completar el formulario */}
         <div ref={refs.bottom} className="h-1" />
+        </div>
       </div>
 
-      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white px-5 py-4 z-20">
-        <button type="submit" className="btn-primary" disabled={!canNext}>
+      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white px-5 py-4 z-20 lg:static lg:translate-x-0 lg:max-w-2xl lg:mx-auto lg:px-0 lg:py-8 lg:bg-transparent lg:flex lg:justify-end">
+        <button type="submit" className="btn-primary lg:w-auto lg:min-w-[240px]" disabled={!canNext}>
           Calcular
         </button>
       </div>
