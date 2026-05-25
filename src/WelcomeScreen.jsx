@@ -1,3 +1,5 @@
+import { useSticky } from './UI'
+
 // ─── Welcome Page Feature Icons ──────────────────────────────────────────────
 export const IconWelcomeUser = () => (
   <svg width="16" height="16" viewBox="0 0 16 16" fill="none" xmlns="http://www.w3.org/2000/svg">
@@ -21,11 +23,26 @@ export const IconWelcomeClock = () => (
 )
 
 export default function WelcomeScreen({ onNext }) {
+  const { sentinelRef, isAtBottom } = useSticky()
+  const ctaCls = `${isAtBottom ? 'mx-auto' : 'fixed bottom-0 left-1/2 -translate-x-1/2'} w-full max-w-[430px] bg-white px-5 py-4 z-20 lg:static lg:translate-x-0 lg:px-0 lg:py-8 lg:bg-transparent lg:flex lg:justify-start`
+
   return (
     <div className="w-full max-w-[430px] lg:max-w-none min-h-screen bg-white flex flex-col mx-auto relative font-sans overflow-hidden lg:grid lg:grid-cols-2 lg:items-stretch">
 
       {/* ─── Columna izquierda (en desktop): hero azul con ilustración ─────── */}
-      <div className="relative flex flex-col lg:bg-blue-brand lg:min-h-screen">
+      <div className="relative flex flex-col lg:bg-blue-brand lg:min-h-screen lg:overflow-hidden">
+
+      {/* Desktop background decoration */}
+      <div className="absolute inset-0 hidden lg:block z-0 pointer-events-none">
+        <div 
+          className="absolute w-[250%] aspect-square rounded-full left-1/2 -translate-x-1/2" 
+          style={{ top: '60%', backgroundColor: '#2D5CE6' }} 
+        />
+        <div 
+          className="absolute w-[250%] aspect-square rounded-full left-1/2 -translate-x-1/2" 
+          style={{ top: '75%', backgroundColor: '#5F81F7' }} 
+        />
+      </div>
 
       {/* Fadedown background animation — top half only */}
       <div className="absolute inset-0 pointer-events-none lg:hidden">
@@ -36,10 +53,10 @@ export default function WelcomeScreen({ onNext }) {
         {/* <div className="fadedown-bg-layer fadedown-bg-layer-4" /> */}
       </div>
 
-      <div className="pt-10 pb-16 md:pb-0 px-6 relative z-10 flex flex-col items-center gap-2 lg:pt-16 lg:items-start lg:px-16 relative md:absolute">
+      <div className="pt-10 pb-16 lg:pb-0 px-6 relative z-10 flex flex-col items-center gap-2 lg:pt-16 lg:items-center lg:px-16 relative lg:absolute w-full">
         {/* White Valora Logo */}
-        <div className="text-white mb-2">
-          <svg width="105" height="26" viewBox="0 0 80 20" fill="none" xmlns="http://www.w3.org/2000/svg">
+        <div className="text-white mb-2 w-[105px] lg:w-[250px]">
+          <svg class="w-full h-auto" viewBox="0 0 80 20" fill="none" xmlns="http://www.w3.org/2000/svg">
             <g clipPath="url(#clip0_974_1072)">
               <path d="M18.3717 1.65155C17.5415 2.36301 16.932 2.99783 16.5417 3.55601C16.1527 4.11419 15.7155 4.9521 15.2312 6.06974L9.44493 19.6551H8.66699L1.89395 4.01328C1.70338 3.57262 1.48801 3.19709 1.24523 2.88287C1.00245 2.56993 0.587371 2.15864 0 1.65155V1.49955H9.10817V1.65155C8.57171 1.95683 8.17752 2.24039 7.9269 2.50224C7.67629 2.76536 7.53271 3.03104 7.49878 3.30183C7.46353 3.57262 7.51574 3.87789 7.6541 4.21638V4.26747C7.6541 4.28407 7.66193 4.30196 7.68021 4.31856L11.7278 14.1461H11.1052L14.4781 6.22302C14.7548 5.57926 14.897 5.04151 14.9062 4.61106C14.914 4.17933 14.7587 3.73994 14.4389 3.29033C14.1178 2.842 13.5696 2.29659 12.7916 1.65283V1.50083H18.3704V1.65283L18.3717 1.65155Z" fill="currentColor" />
               <path d="M18.6621 19.8582C17.5552 19.8582 16.6598 19.5746 15.9758 19.0075C15.2918 18.4404 14.9512 17.683 14.9512 16.7352C14.9512 15.8385 15.254 15.0594 15.8596 14.399C16.4653 13.7386 17.3476 13.1639 18.5067 12.6721C19.6658 12.1816 21.1447 11.7243 22.9433 11.3003L22.9955 8.38036C22.9955 8.09297 22.9303 7.83496 22.8011 7.60632C22.6718 7.37768 22.3821 7.264 21.9318 7.264C21.4475 7.264 21.0585 7.43388 20.7635 7.77237C20.4685 8.11085 20.1227 8.66137 19.7258 9.42264C19.2755 10.3206 18.8696 10.9682 18.5067 11.3654C18.1439 11.7639 17.6674 11.9619 17.0801 11.9619C16.6128 11.9619 16.2408 11.8393 15.9641 11.5941C15.6873 11.3488 15.549 11.0142 15.549 10.5914C15.549 9.9144 15.8988 9.27064 16.5997 8.66137C17.3007 8.0521 18.2222 7.56545 19.363 7.20141C20.5051 6.83738 21.7151 6.65601 22.9955 6.65601C24.5358 6.65601 25.7418 6.96894 26.6151 7.59482C27.4883 8.2207 27.8995 9.26298 27.8472 10.7178L27.6397 17.1171C27.6227 17.3713 27.6697 17.5616 27.782 17.6881C27.8942 17.8145 28.0626 17.8784 28.2884 17.8784C28.496 17.8784 28.6735 17.7813 28.821 17.5859C28.9672 17.3917 29.0755 17.0481 29.1447 16.5577L29.5598 16.6087C29.2648 17.8452 28.7988 18.6869 28.1592 19.1352C27.5196 19.5836 26.7834 19.8084 25.9533 19.8084C24.8973 19.8084 24.1155 19.567 23.6051 19.0842C23.0948 18.6013 22.8402 17.9627 22.8402 17.1669H22.788C22.4761 17.9627 21.9657 18.6103 21.2569 19.1097C20.5469 19.6091 19.6828 19.8582 18.6621 19.8582ZM21.0494 17.8017C21.4123 17.8017 21.7373 17.6842 22.0218 17.4467C22.3077 17.2104 22.5361 16.8795 22.7097 16.4567L22.9433 11.8099C21.8182 12.3183 20.988 12.911 20.4529 13.5879C19.9164 14.2649 19.6488 15.0607 19.6488 15.9752C19.6488 16.6011 19.7781 17.0635 20.0378 17.3598C20.2976 17.6561 20.6343 17.8043 21.0494 17.8043" fill="currentColor" />
@@ -62,8 +79,8 @@ export default function WelcomeScreen({ onNext }) {
         </div>
 
         {/* Por CARE Perú pill */}
-        <div className="bg-white/15 px-2 rounded-ds-pill border border-white/10">
-          <span className="text-[12px] leading-[16px] text-white tracking-wide">
+        <div className="bg-white/15 px-2 lg:px-4 lg:py-1 rounded-ds-pill border border-white/10">
+          <span className="text-[12px] lg:text-sm leading-[16px] text-white tracking-wide">
             Por CARE Perú
           </span>
         </div>
@@ -80,12 +97,12 @@ export default function WelcomeScreen({ onNext }) {
           <img
             src="/img/valora_img_weecome.webp"
             alt="Ilustración Bienvenida Valora"
-            className="w-[90%] h-[90%] object-contain select-none img-zoom-in lg:hidden"
+            className="w-[90%] h-[90%] object-contain select-none img-zoom-in lg:hidden relative z-10"
           />
           <img
             src="/img/valora_img_welcome_desktop.webp"
             alt="Ilustración Bienvenida Valora Desktop"
-            className="object-contain select-none img-zoom-in hidden lg:block"
+            className="object-contain select-none img-zoom-in hidden lg:block relative z-10"
           />
         </div>
       </div>
@@ -93,11 +110,11 @@ export default function WelcomeScreen({ onNext }) {
       </div>
 
       {/* ─── Columna derecha (en desktop): copy + CTA ──────────────────────── */}
-      <div className="flex flex-col lg:justify-center lg:px-16 lg:py-16 lg:bg-white">
+      <div className="flex flex-col lg:justify-center lg:items-start lg:px-16 lg:py-16 lg:bg-white lg:max-w-xl mx-auto">
 
       {/* ─── Text & Copy Area ───────────────────────────────────────────────────── */}
       <div className="px-6 flex flex-col items-center mt-6 text-center relative z-10 lg:items-start lg:text-left lg:px-0 lg:mt-0 lg:max-w-md">
-        <h1 className="text-[26px] leading-[32px] font-medium text-blue-brand lg:text-[44px] lg:leading-[52px] lg:font-semibold">
+        <h1 className="text-[26px] leading-[32px] font-medium text-blue-brand lg:text-[35px] lg:leading-[52px] lg:font-semibold">
           ¡Bienvenida/o a Valora!
         </h1>
         <p className="text-[15px] leading-[22px] text-grey-900 mt-2.5 max-w-[340px] lg:text-[18px] lg:leading-[28px] lg:mt-4 lg:max-w-md">
@@ -121,8 +138,11 @@ export default function WelcomeScreen({ onNext }) {
         </div>
       </div>
 
+      {/* Sentinel: cuando es visible el CTA deja de flotar y pasa a flujo */}
+      <div ref={sentinelRef} style={{ height: 1 }} className="mt-28 lg:mt-0" />
+
       {/* ─── Bottom CTA Button ──────────────────────────────────────────────────── */}
-      <div className="fixed bottom-0 left-1/2 -translate-x-1/2 w-full max-w-[430px] bg-white px-5 py-4 z-20 lg:static lg:translate-x-0 lg:max-w-2xl lg:mx-auto lg:px-0 lg:py-8 lg:bg-transparent lg:flex lg:justify-start">
+      <div className={ctaCls}>
         <button
           type="button"
           onClick={onNext}
