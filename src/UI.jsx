@@ -309,9 +309,21 @@ export const DateInput = forwardRef(({ error, className = '', onChange, value, .
 
 export function FieldError({ message }) {
   if (!message) return null
+
+  // Interceptar mensajes genéricos en inglés (del navegador o Zod)
+  let displayMessage = message
+  if (typeof message === 'string') {
+    const lowerMsg = message.toLowerCase()
+    if (lowerMsg.includes('invalid input') || lowerMsg.includes('expected number, received nan')) {
+      displayMessage = 'Por favor, ingresa un valor válido'
+    } else if (lowerMsg === 'required') {
+      displayMessage = 'Este campo es obligatorio'
+    }
+  }
+
   return (
-    <p className="text-[12px] leading-[18px] font-medium" style={{ color: '#D32F2F' }}>
-      {message}
+    <p className="text-[12px] leading-[18px] font-medium mt-1" style={{ color: '#D32F2F' }}>
+      {displayMessage}
     </p>
   )
 }
