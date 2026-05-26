@@ -71,8 +71,8 @@ const workerSchema = z
     genero: z.enum(['f', 'm', 'otro'], {
       errorMap: () => ({ message: 'Selecciona tu género' }),
     }),
-    terms: z.literal(true, {
-      errorMap: () => ({ message: 'Debes aceptar los Términos y Condiciones' }),
+    terms: z.boolean().refine(val => val === true, {
+      message: 'Marca la casilla de términos para continuar.'
     }),
   })
   .superRefine((val, ctx) => {
