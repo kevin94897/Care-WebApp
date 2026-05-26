@@ -254,7 +254,7 @@ function DetailSheet({ open, onClose, result, benefit }) {
 function CtsView({ data, result }) {
   return (
     <>
-      <div className="mt-2 mb-1 text-[12px] leading-[18px] font-medium text-grey-500 text-center">
+      <div className="mt-2 mb-4 text-[12px] leading-[18px] font-medium text-grey-300 text-center">
         Calculadora de CTS · Mayo 2026
       </div>
 
@@ -475,12 +475,14 @@ export default function Step3({ data, result, benefit, onBack, onDownload }) {
                 aria-haspopup="dialog"
               >
                 <span>{detailBtnLabel}</span>
-                <span className="detail-card-arrow">↗</span>
+                <svg xmlns="http://www.w3.org/2000/svg" width="12" height="12" viewBox="0 0 12 12" fill="none"><g clip-path="url(#clip0_1074_1001)"><path d="M12.111 0.525v8.666a0.666 0.666 0 0 1 -1.333 0V2.135L1.25 11.664A0.667 0.667 0 1 1 0.306 10.72L9.835 1.192H2.778a0.666 0.666 0 1 1 0 -1.333H11.445a0.666 0.666 0 0 1 0.666 0.666" fill="#0034d7"/></g><defs><clipPath id="clip0_1074_1001"><path width="24" height="24" fill="white" d="M0 0H12V12H0V0z"/></clipPath></defs></svg>
               </button>
             </div>
 
+            <div class="w-full h-px bg-gray-200"></div>
+
             {/* Actions */}
-            <div className="mt-4 px-4 py-3.5 text-[13px] leading-[19px] font-medium text-grey-500 text-center lg:text-left lg:px-0 lg:mt-6">
+            <div className="mt-4 px-2 pb-3.5 text-[13px] leading-[19px] font-medium text-grey-500 text-center lg:text-left lg:px-0 lg:mt-6">
               ¿Quieres un documento más completo? Ingresa los datos del empleador/a y los tuyos.
             </div>
             <button className="btn-outline-only mt-2.5 lg:mt-4" onClick={onDownload}>

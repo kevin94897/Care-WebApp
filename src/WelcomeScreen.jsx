@@ -139,7 +139,7 @@ export default function WelcomeScreen({ onNext }) {
       </div>
 
       {/* Sentinel: cuando es visible el CTA deja de flotar y pasa a flujo */}
-      <div ref={sentinelRef} style={{ height: 1 }} className="mt-28 lg:mt-0" />
+      <div ref={sentinelRef} style={{ height: 1 }} className="mt-12 lg:mt-0" />
 
       {/* ─── Bottom CTA Button ──────────────────────────────────────────────────── */}
       <div className={ctaCls}>

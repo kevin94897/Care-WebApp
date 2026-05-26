@@ -234,20 +234,20 @@
 }
 
 .fadedown-bg-layer-1 {
-  height: 30%;
+  height: 50%;
   background: #0034D7;
   z-index: 4;
 }
 
 .fadedown-bg-layer-2 {
-  height: 35%;
+  height: 60%;
   background: #2D5CE6;
   z-index: 3;
   animation: fadedownL2 3s ease-out forwards;
 }
 
 .fadedown-bg-layer-3 {
-  height: 40%;
+  height: 70%;
   background: #5F81F7;
   z-index: 2;
   animation: fadedownL3 3s ease-out forwards;
@@ -368,10 +368,10 @@
   background: #fff;
   color: var(--blue);
   border: var(--bw-default) solid var(--border);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-md);
   font-size: 15px;
   /* body */
-  font-weight: 600;
+  font-weight: 500;
   /* SemiBold (CTA) */
   line-height: 22px;
   cursor: pointer;
@@ -412,7 +412,7 @@
 /* ─── Result screen ─────────────────────────────────────────────────────────── */
 .result-hero {
   background: var(--blue);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-md);
   padding: 24px;
   text-align: center;
   margin-bottom: 20px;
@@ -424,7 +424,7 @@
   color: rgba(255, 255, 255, 0.8);
   font-weight: 500;
   /* Medium */
-  margin-bottom: 4px;
+  margin-bottom: 8px;
 }
 
 .result-hero .amount {
@@ -436,16 +436,16 @@
 }
 
 .result-hero .period {
-  font-size: 12px;
+  font-size: 15px;
   /* caption */
   color: rgba(255, 255, 255, 0.7);
-  margin-top: 4px;
+  margin-top: 8px;
 }
 
 .result-detail {
   /* background: var(--light); */
-  border-radius: var(--r-lg);
-  padding: 16px;
+  border-radius: var(--r-md);
+  padding: 16px 0;
   margin-bottom: 16px;
 }
 
@@ -481,14 +481,14 @@
 /* ─── Detail card / Bottom Sheet trigger ────────────────────────────────────── */
 .detail-card {
   border: var(--bw-default) solid var(--border);
-  border-radius: var(--r-lg);
+  border-radius: var(--r-md);
   overflow: hidden;
-  margin-bottom: 16px;
+  margin-bottom: 24px;
 }
 
 .detail-card-header {
   width: 100%;
-  background: var(--purple-light);
+  background: var(--grey-50);
   padding: 14px 16px;
   display: flex;
   align-items: center;
@@ -506,7 +506,7 @@
 .detail-card-header span {
   font-size: 15px;
   /* label */
-  font-weight: 600;
+  font-weight: 500;
   color: var(--blue);
 }
 
@@ -778,7 +778,7 @@
 .field label {
   font-size: 15px;
   /* label */
-  font-weight: 600;
+  font-weight: 500;
   color: var(--dark);
 }
 
@@ -840,7 +840,7 @@
 
   /* INPUT — border-default 0.5px #8AA2ED · radius-lg 16px · text body */
   .input-base {
-    @apply w-full px-4 py-3.5 rounded-ds-lg text-[15px] leading-[22px] font-medium font-sans text-dark bg-white outline-none transition-all duration-200;
+    @apply w-full px-4 py-3.5 rounded-ds-md text-[15px] leading-[22px] font-sans text-dark bg-gray-50 outline-none transition-all duration-200;
     border: var(--bw-default) solid var(--border);
   }
 
@@ -852,7 +852,7 @@
 
   /* Focus: 2px brand */
   .input-base:focus {
-    border-width: var(--bw-focus);
+    border-width: var(--bw-default);
     border-color: var(--blue);
     box-shadow: 0 0 0 3px rgba(0, 52, 215, 0.08);
   }
@@ -1056,7 +1056,7 @@
     margin: 48px auto 0;
     padding: 56px 32px;
     background: #fff;
-    border-radius: var(--r-lg);
+    border-radius: var(--r-md);
     border: var(--bw-default) solid var(--border);
   }
 
@@ -1105,7 +1105,7 @@
     top: 96px;
     background: var(--blue-light);
     border: var(--bw-default) solid var(--border);
-    border-radius: var(--r-lg);
+    border-radius: var(--r-md);
     padding: 24px;
   }
 

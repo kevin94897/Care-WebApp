@@ -143,43 +143,46 @@ export function Header({ onBack }) {
 export function Stepper({ current }) {
   const steps = ['Tipo', 'Datos', 'Resultado']
   return (
-    <div className="flex items-center justify-center sm:justify-between lg:justify-center px-6 py-5 lg:py-8 lg:gap-4 lg:max-w-2xl lg:mx-auto">
-      {steps.map((s, i) => (
-        <div key={s} className="flex items-center">
-          <div className="flex flex-col items-center gap-1">
-            <div
-              className={`w-8 h-8 lg:w-10 lg:h-10 rounded-ds-pill flex items-center justify-center text-[13px] lg:text-[15px] leading-[19px] font-medium transition-all duration-300 ${
-                i + 1 <= current
-                  ? 'bg-orange-brand text-white'
-                  : 'bg-white text-grey-500 border-hair border-blue-200'
-              }`}
-            >
-              {i + 1 < current ? (
-                <span className="w-4 h-4 flex items-center justify-center">
-                  <IconCheck width="14" height="14" className="w-full h-full" />
-                </span>
-              ) : (
-                i + 1
-              )}
+    <div className="flex items-center py-5 lg:py-8 mx-5 lg:max-w-xl lg:mx-auto">
+      {steps.map((s, i) => {
+        const isLast = i === steps.length - 1
+        return (
+          <div key={s} className={`flex items-center ${isLast ? '' : 'flex-1'}`}>
+            <div className="flex flex-col items-center gap-1">
+              <div
+                className={`w-8 h-8 lg:w-10 lg:h-10 rounded-ds-pill flex items-center justify-center text-[13px] lg:text-[15px] leading-[19px] font-medium transition-all duration-300 ${
+                  i + 1 <= current
+                    ? 'bg-orange-brand text-white'
+                    : 'bg-white text-grey-500 border-hair border-blue-200'
+                }`}
+              >
+                {i + 1 < current ? (
+                  <span className="w-4 h-4 flex items-center justify-center">
+                    <IconCheck width="14" height="14" className="w-full h-full" />
+                  </span>
+                ) : (
+                  i + 1
+                )}
+              </div>
+              <span
+                className={`text-[11px] lg:text-[13px] leading-[16px] font-medium ${
+                  i + 1 === current ? 'text-orange-brand' : 'text-grey-500'
+                }`}
+              >
+                {s}
+              </span>
             </div>
-            <span
-              className={`text-[11px] lg:text-[13px] leading-[16px] font-medium ${
-                i + 1 === current ? 'text-orange-brand' : 'text-grey-500'
-              }`}
-            >
-              {s}
-            </span>
+            {!isLast && (
+              <div
+                className={`flex-1 mx-2 lg:mx-3 mb-4 transition-all duration-300 ${
+                  i + 1 < current ? 'bg-orange-brand' : 'bg-blue-200'
+                }`}
+                style={{ height: i + 1 < current ? '1px' : '0.5px' }}
+              />
+            )}
           </div>
-          {i < steps.length - 1 && (
-            <div
-              className={`h-px w-12 sm:w-24 lg:w-40 mx-1 lg:mx-2 mb-4 transition-all duration-300 ${
-                i + 1 < current ? 'bg-orange-brand' : 'bg-blue-200'
-              }`}
-              style={{ height: i + 1 < current ? '1.5px' : '0.5px' }}
-            />
-          )}
-        </div>
-      ))}
+        )
+      })}
     </div>
   )
 }
@@ -292,7 +295,7 @@ export const DateInput = forwardRef(({ error, className = '', onChange, value, .
         type="text"
         inputMode="numeric"
         pattern="[0-9]*"
-        placeholder="DD/MM/YYYY"
+        placeholder="DD/MM/AAAA"
         className={`input-base pr-12 ${error ? 'error' : ''} ${className}`}
         onChange={handleInput}
         onKeyDown={handleKeyDown}

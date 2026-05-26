@@ -89,7 +89,7 @@ export default function Step2({ onNext, onBack, savedData, onSave }) {
   return (
     <form onSubmit={handleSubmit(onSubmit)} noValidate>
       <Header onBack={onBack} />
-      <div className="px-5 pt-5 pb-28 overflow-y-auto lg:dt-shell lg:pb-0 lg:overflow-visible">
+      <div className="px-5 pt-5 pb-12 overflow-y-auto lg:dt-shell lg:pb-0 lg:overflow-visible">
         <Stepper current={2} />
         <div className="h-4" />
         <div className="lg:max-w-2xl lg:mx-auto">
